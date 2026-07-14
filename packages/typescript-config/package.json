@@ -1,0 +1,28 @@
+{
+  "name": "@retail/typescript-config",
+  "version": "0.1.0",
+  "private": true,
+  "files": [
+    "base.json",
+    "nestjs.json",
+    "vite.json"
+  ],
+  "exports": {
+    "./base": "./base.json",
+    "./base.json": "./base.json",
+    "./nestjs": "./nestjs.json",
+    "./nestjs.json": "./nestjs.json",
+    "./vite": "./vite.json",
+    "./vite.json": "./vite.json"
+  },
+  "scripts": {
+    "build": "node -e \"for(const file of ['base.json','nestjs.json','vite.json']) JSON.parse(require('node:fs').readFileSync(file,'utf8'))\"",
+    "lint": "pnpm build",
+    "typecheck": "pnpm build",
+    "test": "pnpm build",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\""
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

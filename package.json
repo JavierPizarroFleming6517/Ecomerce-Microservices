@@ -1,0 +1,35 @@
+{
+  "name": "retail-ecommerce-platform",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.13.0",
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "smoke": "powershell -ExecutionPolicy Bypass -File infrastructure/scripts/check-services.ps1",
+    "env:init": "powershell -ExecutionPolicy Bypass -File infrastructure/scripts/prepare-env.ps1",
+    "clean": "turbo run clean",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs,cjs,json,jsonc,md,yml,yaml,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,cjs,json,jsonc,md,yml,yaml,css}\"",
+    "db:generate": "turbo run db:generate",
+    "db:migrate": "turbo run db:migrate",
+    "db:seed": "turbo run db:seed",
+    "docker:infra": "docker compose --profile infra up -d",
+    "docker:full": "docker compose --profile full up --build",
+    "docker:down": "docker compose --profile infra --profile full down"
+  },
+  "devDependencies": {
+    "pnpm": "11.13.0",
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.5",
+    "typescript": "^5.8.3"
+  }
+}

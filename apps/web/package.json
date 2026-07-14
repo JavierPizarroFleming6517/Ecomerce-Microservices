@@ -1,0 +1,40 @@
+{
+  "name": "@retail/web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc -b --pretty false",
+    "test": "vitest run",
+    "clean": "node -e \"const fs=require('node:fs'); for (const path of ['dist','coverage','node_modules/.tmp']) fs.rmSync(path,{recursive:true,force:true})\"",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@retail/contracts": "workspace:*",
+    "@retail/ui": "workspace:*",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@retail/eslint-config": "workspace:*",
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/node": "^24.13.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "eslint": "^9.0.0",
+    "eslint-plugin-react-hooks": "^7.0.0",
+    "eslint-plugin-react-refresh": "^0.4.0",
+    "globals": "^16.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.0.0",
+    "vite": "^8.1.1",
+    "vitest": "^4.0.0"
+  }
+}

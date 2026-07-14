@@ -1,0 +1,43 @@
+{
+  "name": "@retail/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./constants": {
+      "types": "./dist/constants/index.d.ts",
+      "require": "./dist/constants/index.js",
+      "default": "./dist/constants/index.js"
+    },
+    "./dto": {
+      "types": "./dist/dto/index.d.ts",
+      "require": "./dist/dto/index.js",
+      "default": "./dist/dto/index.js"
+    },
+    "./interfaces": {
+      "types": "./dist/interfaces/index.d.ts",
+      "require": "./dist/interfaces/index.js",
+      "default": "./dist/interfaces/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint \"src/**/*.ts\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsc -p tsconfig.json --noEmit",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\""
+  },
+  "devDependencies": {
+    "@retail/eslint-config": "workspace:*",
+    "@retail/typescript-config": "workspace:*",
+    "eslint": "^9.18.0",
+    "typescript": "^5.8.3"
+  }
+}
