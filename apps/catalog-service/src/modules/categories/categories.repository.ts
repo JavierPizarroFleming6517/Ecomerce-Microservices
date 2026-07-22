@@ -27,4 +27,11 @@ export class CategoriesRepository {
   findBySlug(slug: string): Promise<CategoryDocument | null> {
     return this.categoryModel.findOne({ slug: slug.toLowerCase() }).exec();
   }
+
+  findAllActive(): Promise<CategoryDocument[]> {
+    return this.categoryModel
+      .find({ active: true })
+      .sort({ name: 1 })
+      .exec();
+  }
 }

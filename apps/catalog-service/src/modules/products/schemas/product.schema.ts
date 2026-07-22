@@ -29,6 +29,9 @@ export class Product {
   @Prop({ required: true, uppercase: true, trim: true, minlength: 3 })
   currency!: string;
 
+  @Prop({ trim: true, default: '' })
+  imageUrl!: string;
+
   @Prop({ default: true })
   active!: boolean;
 }

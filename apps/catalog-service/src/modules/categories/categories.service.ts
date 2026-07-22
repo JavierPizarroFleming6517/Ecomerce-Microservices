@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { CategorySummaryDto } from '@retail/contracts';
 import {
   CategoriesRepository,
   type CreateCategory,
@@ -14,5 +15,14 @@ export class CategoriesService {
 
   findBySlug(slug: string) {
     return this.categories.findBySlug(slug);
+  }
+
+  async listAll(): Promise<CategorySummaryDto[]> {
+    const categories = await this.categories.findAllActive();
+
+    return categories.map((category) => ({
+      name: category.name,
+      slug: category.slug,
+    }));
   }
 }
