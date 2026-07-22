@@ -1,8 +1,6 @@
 import type { ProductSummaryDto } from '@retail/contracts'
 import { useCallback, useEffect, useState } from 'react'
-import { getFeaturedProducts } from './api'
-
-const FEATURED_PRODUCTS_LIMIT = 12
+import { getProducts } from '../../api/catalog'
 
 async function fetchProducts(
   categorySlug: string | null,
@@ -12,11 +10,7 @@ async function fetchProducts(
   signal?: AbortSignal,
 ) {
   try {
-    const nextProducts = await getFeaturedProducts(
-      FEATURED_PRODUCTS_LIMIT,
-      categorySlug,
-      signal,
-    )
+    const nextProducts = await getProducts(12, categorySlug, signal)
 
     if (!signal?.aborted) {
       setProducts(nextProducts)
@@ -28,7 +22,7 @@ async function fetchProducts(
       setError(
         error instanceof Error
           ? error.message
-          : 'No fue posible cargar los productos destacados.',
+          : 'No fue posible cargar los productos.',
       )
       setIsLoading(false)
     }

@@ -32,6 +32,7 @@ export function StatusCard({
   description,
   className,
   ...sectionProps
+  
 }: StatusCardProps) {
   const variant = statusCardStyles.variants[status];
 

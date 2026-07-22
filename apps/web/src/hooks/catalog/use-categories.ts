@@ -1,6 +1,6 @@
 import type { CategorySummaryDto } from '@retail/contracts'
 import { useCallback, useEffect, useState } from 'react'
-import { getCategories } from './categories-api'
+import { getCategories } from '../../api/catalog'
 
 async function fetchCategories(
   setCategories: (categories: CategorySummaryDto[]) => void,
@@ -26,7 +26,8 @@ export function useCategories() {
   const [isLoading, setIsLoading] = useState(true)
 
   const load = useCallback(
-    (signal?: AbortSignal) => fetchCategories(setCategories, setIsLoading, signal),
+    (signal?: AbortSignal) =>
+      fetchCategories(setCategories, setIsLoading, signal),
     [],
   )
 

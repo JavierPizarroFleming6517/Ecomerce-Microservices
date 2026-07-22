@@ -1,6 +1,6 @@
 import type { PingResponseDto } from '@retail/contracts'
-import { getApi } from '../../lib/http'
-import type { ServiceProbe, ServiceStatus } from './types'
+import { getApi } from '../lib/http'
+import type { ServiceProbe, ServiceStatus } from '../types/health'
 
 interface GatewayHealthResponse {
   status: 'ok'
@@ -64,7 +64,9 @@ async function checkService(
       latencyMs: Math.round(performance.now() - startedAt),
       checkedAt: new Date().toISOString(),
       detail:
-        error instanceof Error ? error.message : 'No fue posible consultar el servicio.',
+        error instanceof Error
+          ? error.message
+          : 'No fue posible consultar el servicio.',
     }
   }
 }

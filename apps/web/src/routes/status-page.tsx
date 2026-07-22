@@ -1,5 +1,5 @@
-import { ServiceStatusCard } from '../features/health/service-status-card'
-import { useSystemStatus } from '../features/health/use-system-status'
+import { ServiceStatusCard } from '../components/health/service-status-card'
+import { useSystemStatus } from '../hooks/health/use-system-status'
 import { API_BASE_URL } from '../lib/env'
 
 export function StatusPage() {

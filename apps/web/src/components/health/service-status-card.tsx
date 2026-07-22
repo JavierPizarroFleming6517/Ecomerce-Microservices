@@ -1,5 +1,5 @@
 import { StatusCard } from '@retail/ui'
-import type { ServiceStatus } from './types'
+import type { ServiceStatus } from '../../types/health'
 
 interface ServiceStatusCardProps {
   service: ServiceStatus

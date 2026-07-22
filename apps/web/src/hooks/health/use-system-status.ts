@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getSystemStatus } from './api'
-import type { ServiceStatus } from './types'
+import { getSystemStatus } from '../../api/health'
+import type { ServiceStatus } from '../../types/health'
 
 async function fetchServices(
   setServices: (services: ServiceStatus[]) => void,
@@ -24,13 +24,10 @@ export function useSystemStatus() {
     [],
   )
 
-  const refresh = useCallback(
-    async (signal?: AbortSignal) => {
-      setIsLoading(true)
-      await fetchServices(setServices, setIsLoading, signal)
-    },
-    [],
-  )
+  const refresh = useCallback(async (signal?: AbortSignal) => {
+    setIsLoading(true)
+    await fetchServices(setServices, setIsLoading, signal)
+  }, [])
 
   useEffect(() => {
     const controller = new AbortController()

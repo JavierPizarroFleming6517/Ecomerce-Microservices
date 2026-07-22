@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom'
-import { AppShell } from '../components/app-shell'
+import { AppShell } from '../components/common/app-shell'
 import { HomePage } from '../routes/home-page'
 import { NotFoundPage } from '../routes/not-found-page'
 import { StatusPage } from '../routes/status-page'
