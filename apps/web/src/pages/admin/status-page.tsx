@@ -1,6 +1,6 @@
-import { ServiceStatusCard } from '../components/health/service-status-card'
-import { useSystemStatus } from '../hooks/health/use-system-status'
-import { API_BASE_URL } from '../lib/env'
+import { ServiceStatusCard } from '../../components/health/service-status-card'
+import { useSystemStatus } from '../../hooks/health/use-system-status'
+import { API_BASE_URL } from '../../lib/env'
 
 export function StatusPage() {
   const { services, isLoading, refresh } = useSystemStatus()

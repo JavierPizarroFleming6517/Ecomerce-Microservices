@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { ProductCard } from '../components/catalog/ProductCard'
-import { useCategories } from '../hooks/catalog/use-categories'
-import { useFeaturedProducts } from '../hooks/catalog/use-featured-products'
+import { ProductCard } from '../../components/catalog/ProductCard'
+import { useCategories } from '../../hooks/catalog/use-categories'
+import { useFeaturedProducts } from '../../hooks/catalog/use-featured-products'
 
 export function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)

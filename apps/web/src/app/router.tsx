@@ -1,8 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { AppShell } from '../components/common/app-shell'
-import { HomePage } from '../routes/home-page'
-import { NotFoundPage } from '../routes/not-found-page'
-import { StatusPage } from '../routes/status-page'
+import { StatusPage } from '../pages/admin/status-page'
+import { NotFoundPage } from '../pages/not-found-page'
+import { HomePage } from '../pages/store/home-page'
 
 export const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
