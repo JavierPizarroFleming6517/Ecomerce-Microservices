@@ -8,7 +8,7 @@ import type {
 } from '@retail/contracts';
 import type { Request } from 'express';
 
-import { InternalHttpService } from '../../internal/internal-http.service';
+import { InternalHttpService } from '../internal/internal-http.service';
 
 type CorrelatedRequest = Request & { correlationId?: string };
 

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
-import { CategorySchema, Category } from '../src/modules/categories/schemas/category.schema';
-import { ProductSchema, Product } from '../src/modules/products/schemas/product.schema';
-import { StockSchema, Stock } from '../src/modules/inventory/schemas/stock.schema';
+import { CategorySchema, Category } from '../src/categories/schemas/category.schema';
+import { ProductSchema, Product } from '../src/products/schemas/product.schema';
+import { StockSchema, Stock } from '../src/inventory/schemas/stock.schema';
 
 interface SeedCategory {
   name: string;

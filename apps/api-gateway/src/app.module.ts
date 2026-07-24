@@ -7,9 +7,9 @@ import { CorrelationIdInterceptor } from './common/correlation-id.interceptor';
 import { HttpExceptionFilter } from './common/http-exception.filter';
 import { environmentValidationSchema } from './config/environment.validation';
 import { HealthModule } from './health/health.module';
-import { CatalogModule } from './modules/catalog/catalog.module';
-import { RecommendationsModule } from './modules/recommendations/recommendations.module';
-import { UsersModule } from './modules/users/users.module';
+import { CatalogModule } from './catalog/catalog.module';
+import { RecommendationsModule } from './recommendations/recommendations.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
