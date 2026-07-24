@@ -14,11 +14,6 @@ import { RecommendationsModule } from './recommendations/recommendations.module'
       cache: true,
       validationSchema: Joi.object({
         PORT: Joi.number().port().default(3003),
-        RABBITMQ_URL: Joi.string()
-          .uri({ scheme: ['amqp', 'amqps'] })
-          .required(),
-        RABBITMQ_QUEUE: Joi.string().default('recommendations_queue'),
-        RABBITMQ_PREFETCH: Joi.number().integer().min(1).default(10),
         NEO4J_URI: Joi.string()
           .uri({ scheme: ['neo4j', 'neo4j+s', 'bolt', 'bolt+s'] })
           .required(),

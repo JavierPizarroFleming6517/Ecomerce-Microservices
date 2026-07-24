@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 
-import { MessagingModule } from '../../messaging/messaging.module';
+import { InternalHttpModule } from '../../internal/internal-http.module';
 import { UsersController } from './users.controller';
 
 @Module({
-  imports: [MessagingModule],
+  imports: [InternalHttpModule],
   controllers: [UsersController],
 })
 export class UsersModule {}

@@ -9,7 +9,6 @@ describe('Health (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
-    process.env.RABBITMQ_URL = 'amqp://localhost:5672';
     process.env.NEO4J_URI = 'neo4j://localhost:7687';
     process.env.NEO4J_USERNAME = 'neo4j';
     process.env.NEO4J_PASSWORD = 'test';
