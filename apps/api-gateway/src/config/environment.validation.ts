@@ -15,4 +15,7 @@ export const environmentValidationSchema = Joi.object({
   RECOMMENDATIONS_SERVICE_URL: Joi.string()
     .uri({ scheme: ['http', 'https'] })
     .default('http://localhost:3003'),
+  PAYMENTS_SERVICE_URL: Joi.string()
+    .uri({ scheme: ['http', 'https'] })
+    .default('http://localhost:3004'),
 });

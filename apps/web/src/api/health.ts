@@ -33,6 +33,12 @@ export const serviceProbes: ServiceProbe[] = [
     description: 'Sugerencias personalizadas',
     endpoint: '/api/v1/recommendations/ping',
   },
+  {
+    id: 'payments',
+    name: 'Pagos',
+    description: 'Webpay Plus (Transbank)',
+    endpoint: '/api/v1/payments/ping',
+  },
 ]
 
 async function checkService(

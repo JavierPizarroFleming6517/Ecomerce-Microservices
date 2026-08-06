@@ -8,6 +8,7 @@ import { HttpExceptionFilter } from './common/http-exception.filter';
 import { environmentValidationSchema } from './config/environment.validation';
 import { HealthModule } from './health/health.module';
 import { CatalogModule } from './catalog/catalog.module';
+import { PaymentsModule } from './payments/payments.module';
 import { RecommendationsModule } from './recommendations/recommendations.module';
 import { UsersModule } from './users/users.module';
 
@@ -26,6 +27,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     CatalogModule,
     RecommendationsModule,
+    PaymentsModule,
   ],
   providers: [
     {

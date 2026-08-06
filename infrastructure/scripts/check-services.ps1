@@ -5,6 +5,7 @@ $checks = @(
   @{ Name = 'Users'; Uri = 'http://localhost:3001/health/live' },
   @{ Name = 'Catalog'; Uri = 'http://localhost:3002/health/live' },
   @{ Name = 'Recommendations'; Uri = 'http://localhost:3003/health/live' },
+  @{ Name = 'Payments'; Uri = 'http://localhost:3004/health/live' },
   @{ Name = 'Web'; Uri = 'http://localhost:5173' }
 )
 

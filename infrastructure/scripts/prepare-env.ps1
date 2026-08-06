@@ -12,7 +12,8 @@ $pairs = @(
   @{ Source = (Join-Path $root 'apps\api-gateway\.env.example'); Target = (Join-Path $root 'apps\api-gateway\.env') },
   @{ Source = (Join-Path $root 'apps\users-service\.env.example'); Target = (Join-Path $root 'apps\users-service\.env') },
   @{ Source = (Join-Path $root 'apps\catalog-service\.env.example'); Target = (Join-Path $root 'apps\catalog-service\.env') },
-  @{ Source = (Join-Path $root 'apps\recommendations-service\.env.example'); Target = (Join-Path $root 'apps\recommendations-service\.env') }
+  @{ Source = (Join-Path $root 'apps\recommendations-service\.env.example'); Target = (Join-Path $root 'apps\recommendations-service\.env') },
+  @{ Source = (Join-Path $root 'apps\payments-service\.env.example'); Target = (Join-Path $root 'apps\payments-service\.env') }
 )
 
 foreach ($pair in $pairs) {

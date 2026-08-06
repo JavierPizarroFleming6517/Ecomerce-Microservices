@@ -93,6 +93,7 @@ services:
       USERS_SERVICE_URL: http://users-service:3001
       CATALOG_SERVICE_URL: http://catalog-service:3002
       RECOMMENDATIONS_SERVICE_URL: http://recommendations-service:3003
+      PAYMENTS_SERVICE_URL: http://payments-service:3004
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-replace-with-at-least-32-characters}
     ports:
       - "3000:3000"
@@ -108,6 +109,8 @@ services:
       catalog-service:
         condition: service_healthy
       recommendations-service:
+        condition: service_healthy
+      payments-service:
         condition: service_healthy
 
   users-service:
@@ -182,6 +185,28 @@ services:
     depends_on:
       neo4j:
         condition: service_healthy
+
+  payments-service:
+    <<: *app-common
+    profiles: [full]
+    build:
+      context: .
+      dockerfile: apps/payments-service/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3004
+      TRANSBANK_ENVIRONMENT: ${TRANSBANK_ENVIRONMENT:-integration}
+      WEBPAY_RETURN_URL: ${WEBPAY_RETURN_URL:-http://localhost:5173/payments/result}
+      TRANSBANK_COMMERCE_CODE: ${TRANSBANK_COMMERCE_CODE:-}
+      TRANSBANK_API_KEY: ${TRANSBANK_API_KEY:-}
+    expose:
+      - "3004"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3004/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   web:
     <<: *app-common

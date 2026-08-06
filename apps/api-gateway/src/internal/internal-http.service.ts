@@ -8,7 +8,7 @@ import { HttpService } from '@nestjs/axios';
 import { AxiosError } from 'axios';
 import { firstValueFrom, TimeoutError, timeout } from 'rxjs';
 
-const HTTP_TIMEOUT_MS = 5000;
+const HTTP_TIMEOUT_MS = 15000;
 
 @Injectable()
 export class InternalHttpService {
@@ -22,20 +22,50 @@ export class InternalHttpService {
       headers?: Record<string, string | undefined>;
     },
   ): Promise<TResult> {
-    const url = this.joinUrl(baseUrl, path);
+    return this.request<TResult>('get', baseUrl, path, options);
+  }
 
+  async post<TResult>(
+    baseUrl: string,
+    path: string,
+    body?: unknown,
+    options?: {
+      headers?: Record<string, string | undefined>;
+    },
+  ): Promise<TResult> {
+    return this.request<TResult>('post', baseUrl, path, {
+      ...options,
+      data: body,
+    });
+  }
+
+  private async request<TResult>(
+    method: 'get' | 'post',
+    baseUrl: string,
+    path: string,
+    options?: {
+      params?: Record<string, string | number | undefined>;
+      headers?: Record<string, string | undefined>;
+      data?: unknown;
+    },
+  ): Promise<TResult> {
+    const url = this.joinUrl(baseUrl, path);
     const params = this.omitUndefined(options?.params);
     const headers = this.omitUndefined(options?.headers);
     const requestConfig = {
       ...(params ? { params } : {}),
       ...(headers ? { headers } : {}),
+      ...(options?.data !== undefined ? { data: options.data } : {}),
     };
 
     try {
       const response = await firstValueFrom(
-        this.http
-          .get<TResult>(url, requestConfig)
-          .pipe(timeout(HTTP_TIMEOUT_MS)),
+        (method === 'get'
+          ? this.http.get<TResult>(url, requestConfig)
+          : this.http.post<TResult>(url, options?.data, {
+              ...(headers ? { headers } : {}),
+            })
+        ).pipe(timeout(HTTP_TIMEOUT_MS)),
       );
 
       return response.data;

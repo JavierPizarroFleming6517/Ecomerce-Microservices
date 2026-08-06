@@ -5,7 +5,7 @@ import { InternalHttpService } from './internal-http.service';
 @Module({
   imports: [
     HttpModule.register({
-      timeout: 5000,
+      timeout: 15000,
       maxRedirects: 0,
     }),
   ],

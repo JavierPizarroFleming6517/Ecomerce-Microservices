@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:1
+# Prunes the monorepo down to only what @retail/payments-service needs.
+FROM node:24-alpine AS pruner
+RUN npm install --global turbo
+WORKDIR /workspace
+COPY . .
+RUN turbo prune @retail/payments-service --docker
+
+FROM node:24-alpine AS build
+RUN corepack enable
+WORKDIR /workspace
+COPY --from=pruner /workspace/out/json/ .
+RUN pnpm install --frozen-lockfile
+COPY --from=pruner /workspace/out/full/ .
+RUN pnpm turbo run build --filter=@retail/payments-service
+
+FROM node:24-alpine AS runtime
+ENV NODE_ENV=production
+WORKDIR /workspace
+COPY --from=build --chown=node:node /workspace /workspace
+USER node
+EXPOSE 3004
+CMD ["node", "apps/payments-service/dist/main.js"]

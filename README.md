@@ -1,7 +1,7 @@
 # Retail E-commerce Platform
 
 Monorepo para una plataforma de retail por departamentos. Turborepo coordina un frontend
-React y cuatro aplicaciones NestJS; el API Gateway habla con los servicios internos por
+React y cinco aplicaciones NestJS; el API Gateway habla con los servicios internos por
 HTTP REST y cada dominio conserva la propiedad exclusiva de su almacenamiento.
 
 ## Arquitectura
@@ -13,6 +13,7 @@ HTTP REST y cada dominio conserva la propiedad exclusiva de su almacenamiento.
 | `@retail/users-service` | 3001 | Identidad, autenticación y perfiles | PostgreSQL |
 | `@retail/catalog-service` | 3002 | Productos, categorías e inventario | MongoDB |
 | `@retail/recommendations-service` | 3003 | Grafo y cross-selling | Neo4j |
+| `@retail/payments-service` | 3004 | Pagos Webpay Plus (Transbank) | En memoria (sandbox) |
 
 Neo4j Browser está en
 [http://localhost:7474](http://localhost:7474).
@@ -57,12 +58,14 @@ secretos fuera del entorno de desarrollo y no versiones archivos `.env`.
 Cada aplicación incluye su propio `.env.example`. Las variables principales son:
 
 - Gateway: `API_GATEWAY_PORT`, `CORS_ORIGINS`, `USERS_SERVICE_URL`,
-  `CATALOG_SERVICE_URL`, `RECOMMENDATIONS_SERVICE_URL`.
+  `CATALOG_SERVICE_URL`, `RECOMMENDATIONS_SERVICE_URL`, `PAYMENTS_SERVICE_URL`.
 - Usuarios: `DATABASE_URL`, `DIRECT_URL`, `JWT_ACCESS_SECRET`,
   `JWT_REFRESH_SECRET`.
 - Catálogo: `MONGODB_URI`, `MONGODB_DB`.
 - Recomendaciones: `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`,
   `NEO4J_DATABASE`.
+- Pagos: `TRANSBANK_ENVIRONMENT`, `WEBPAY_RETURN_URL` (y en producción
+  `TRANSBANK_COMMERCE_CODE`, `TRANSBANK_API_KEY`).
 - Web: `VITE_API_BASE_URL`. No debe contener secretos porque Vite la incorpora al bundle.
 
 La configuración se valida al iniciar cada proceso. Los endpoints `health/live` no
@@ -82,7 +85,7 @@ un paso explícito de despliegue.
 
 - Las aplicaciones solo comparten contratos, logging, configuración y UI.
 - Ningún servicio importa modelos, repositorios o clientes de base de otro servicio.
-- El gateway es la única API de negocio pública. Los puertos `3001-3003` son de operación
+- El gateway es la única API de negocio pública. Los puertos `3001-3004` son de operación
   local, healthchecks y comunicación interna HTTP.
 
 ## Comunicación interna HTTP
@@ -90,7 +93,7 @@ un paso explícito de despliegue.
 - El gateway usa `@nestjs/axios` (`HttpModule`) para llamar a los microservicios.
 - URLs internas locales: `http://localhost:3001|3002|3003`.
 - En Docker Compose: `http://users-service:3001`, `http://catalog-service:3002`,
-  `http://recommendations-service:3003`.
+  `http://recommendations-service:3003`, `http://payments-service:3004`.
 - El gateway traduce timeouts y fallos del downstream a respuestas HTTP (`502`/`504`).
 
 ## Imágenes Docker
