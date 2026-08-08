@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import type { ProductSummaryDto } from '@retail/contracts';
 import type { Types } from 'mongoose';
 import {
@@ -21,6 +21,15 @@ export class ProductsService {
 
   findBySku(sku: string) {
     return this.products.findBySku(sku);
+  }
+
+  async getActiveBySku(sku: string): Promise<ProductSummaryDto> {
+    const product = await this.products.findBySku(sku);
+    if (!product) {
+      throw new NotFoundException(`Product ${sku} not found`);
+    }
+
+    return this.toSummary(product);
   }
 
   async listActive(

@@ -90,6 +90,7 @@ services:
       NODE_ENV: production
       API_GATEWAY_PORT: 3000
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
       USERS_SERVICE_URL: http://users-service:3001
       CATALOG_SERVICE_URL: http://catalog-service:3002
       RECOMMENDATIONS_SERVICE_URL: http://recommendations-service:3003
@@ -196,7 +197,7 @@ services:
       NODE_ENV: production
       PORT: 3004
       TRANSBANK_ENVIRONMENT: ${TRANSBANK_ENVIRONMENT:-integration}
-      WEBPAY_RETURN_URL: ${WEBPAY_RETURN_URL:-http://localhost:5173/payments/result}
+      WEBPAY_RETURN_URL: ${WEBPAY_RETURN_URL:-http://localhost:3000/api/v1/payments/transactions/return}
       TRANSBANK_COMMERCE_CODE: ${TRANSBANK_COMMERCE_CODE:-}
       TRANSBANK_API_KEY: ${TRANSBANK_API_KEY:-}
     expose:

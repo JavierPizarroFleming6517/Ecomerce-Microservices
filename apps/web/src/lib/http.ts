@@ -15,16 +15,7 @@ export function getApiUrl(path: string): string {
   return `${API_BASE_URL}${normalizedPath}`
 }
 
-export async function getApi<T>(
-  path: string,
-  signal?: AbortSignal,
-): Promise<T> {
-  const response = await fetch(getApiUrl(path), {
-    method: 'GET',
-    headers: { Accept: 'application/json' },
-    signal,
-  })
-
+async function parseResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     throw new HttpError(
       `La API respondió con estado ${response.status}.`,
@@ -43,4 +34,35 @@ export async function getApi<T>(
   } catch {
     return body as T
   }
+}
+
+export async function getApi<T>(
+  path: string,
+  signal?: AbortSignal,
+): Promise<T> {
+  const response = await fetch(getApiUrl(path), {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+    signal,
+  })
+
+  return parseResponse<T>(response)
+}
+
+export async function postApi<T>(
+  path: string,
+  data?: unknown,
+  signal?: AbortSignal,
+): Promise<T> {
+  const response = await fetch(getApiUrl(path), {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: data === undefined ? undefined : JSON.stringify(data),
+    signal,
+  })
+
+  return parseResponse<T>(response)
 }

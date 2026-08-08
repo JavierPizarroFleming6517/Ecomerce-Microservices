@@ -6,6 +6,9 @@ export const environmentValidationSchema = Joi.object({
     .default('development'),
   API_GATEWAY_PORT: Joi.number().port().default(3000),
   CORS_ORIGINS: Joi.string().default('http://localhost:5173'),
+  FRONTEND_URL: Joi.string()
+    .uri({ scheme: ['http', 'https'] })
+    .default('http://localhost:5173'),
   USERS_SERVICE_URL: Joi.string()
     .uri({ scheme: ['http', 'https'] })
     .default('http://localhost:3001'),

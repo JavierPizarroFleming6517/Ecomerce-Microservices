@@ -35,3 +35,13 @@ export async function getProducts(
 
   return response?.items ?? []
 }
+
+export async function getProduct(
+  sku: string,
+  signal?: AbortSignal,
+): Promise<ProductSummaryDto> {
+  return getApi<ProductSummaryDto>(
+    `/api/v1/catalog/products/${encodeURIComponent(sku)}`,
+    signal,
+  )
+}

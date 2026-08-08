@@ -12,5 +12,5 @@ export const environmentValidationSchema = Joi.object({
   TRANSBANK_API_KEY: Joi.string().optional(),
   WEBPAY_RETURN_URL: Joi.string()
     .uri({ scheme: ['http', 'https'] })
-    .default('http://localhost:5173/payments/result'),
+    .default('http://localhost:3000/api/v1/payments/transactions/return'),
 });

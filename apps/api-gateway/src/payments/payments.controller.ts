@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   ApiBadGatewayResponse,
@@ -12,7 +12,7 @@ import type {
   CreatePaymentTransactionResponseDto,
   PingResponseDto,
 } from '@retail/contracts';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 
 import { InternalHttpService } from '../internal/internal-http.service';
 
@@ -22,12 +22,14 @@ type CorrelatedRequest = Request & { correlationId?: string };
 @Controller('payments')
 export class PaymentsController {
   private readonly paymentsServiceUrl: string;
+  private readonly frontendUrl: string;
 
   constructor(
     private readonly http: InternalHttpService,
     config: ConfigService,
   ) {
     this.paymentsServiceUrl = config.getOrThrow<string>('PAYMENTS_SERVICE_URL');
+    this.frontendUrl = config.getOrThrow<string>('FRONTEND_URL');
   }
 
   @Get('ping')
@@ -87,5 +89,42 @@ export class PaymentsController {
         headers: { 'x-correlation-id': request.correlationId },
       },
     );
+  }
+
+  @Post('transactions/return')
+  @ApiOkResponse({
+    description: 'Webpay browser return; redirects to the storefront result page',
+  })
+  returnFromWebpay(
+    @Body()
+    body: {
+      token_ws?: string;
+      TBK_TOKEN?: string;
+      TBK_ORDEN_COMPRA?: string;
+    },
+    @Res() response: Response,
+  ): void {
+    const frontend = this.frontendUrl.replace(/\/+$/, '');
+
+    if (body.token_ws) {
+      response.redirect(
+        `${frontend}/payments/result?token_ws=${encodeURIComponent(body.token_ws)}`,
+      );
+      return;
+    }
+
+    if (body.TBK_TOKEN) {
+      const params = new URLSearchParams({
+        cancelled: '1',
+        token: body.TBK_TOKEN,
+      });
+      if (body.TBK_ORDEN_COMPRA) {
+        params.set('buyOrder', body.TBK_ORDEN_COMPRA);
+      }
+      response.redirect(`${frontend}/payments/result?${params.toString()}`);
+      return;
+    }
+
+    response.redirect(`${frontend}/payments/result?timeout=1`);
   }
 }

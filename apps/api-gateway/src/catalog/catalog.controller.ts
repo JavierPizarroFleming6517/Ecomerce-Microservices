@@ -1,10 +1,11 @@
-import { Controller, Get, Query, Req } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiBadGatewayResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import type {
   ListCategoriesResponseDto,
   ListProductsResponseDto,
   PingResponseDto,
+  ProductSummaryDto,
 } from '@retail/contracts';
 import type { Request } from 'express';
 
@@ -46,6 +47,18 @@ export class CatalogController {
         limit: limit ? Number(limit) : undefined,
         category,
       },
+      headers: { 'x-correlation-id': request.correlationId },
+    });
+  }
+
+  @Get('products/:sku')
+  @ApiOkResponse({ description: 'Product detail' })
+  @ApiBadGatewayResponse({ description: 'Catalog service is unavailable' })
+  getProduct(
+    @Req() request: CorrelatedRequest,
+    @Param('sku') sku: string,
+  ): Promise<ProductSummaryDto> {
+    return this.http.get(this.catalogServiceUrl, `/products/${sku}`, {
       headers: { 'x-correlation-id': request.correlationId },
     });
   }

@@ -1,5 +1,8 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import type { ListProductsResponseDto } from '@retail/contracts';
+import { Controller, Get, Param, Query } from '@nestjs/common';
+import type {
+  ListProductsResponseDto,
+  ProductSummaryDto,
+} from '@retail/contracts';
 import { CategoriesService } from '../categories/categories.service';
 import { ProductsService } from './products.service';
 
@@ -28,5 +31,10 @@ export class ProductsController {
 
     const items = await this.products.listActive(parsedLimit);
     return { items };
+  }
+
+  @Get(':sku')
+  getBySku(@Param('sku') sku: string): Promise<ProductSummaryDto> {
+    return this.products.getActiveBySku(sku);
   }
 }

@@ -27,7 +27,10 @@ export class ProductsRepository {
   }
 
   findBySku(sku: string): Promise<ProductDocument | null> {
-    return this.productModel.findOne({ sku: sku.toUpperCase() }).exec();
+    return this.productModel
+      .findOne({ sku: sku.toUpperCase(), active: true })
+      .populate('category')
+      .exec();
   }
 
   findActive(
