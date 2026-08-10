@@ -1,5 +1,6 @@
 import type {
   CategorySummaryDto,
+  HybridRelatedProductsDto,
   ListCategoriesResponseDto,
   ListProductsResponseDto,
   ProductDetailDto,
@@ -63,10 +64,15 @@ export async function getSimilarProducts(
   sku: string,
   limit = 8,
   signal?: AbortSignal,
-): Promise<ProductSummaryDto[]> {
+): Promise<HybridRelatedProductsDto> {
   const params = new URLSearchParams({ limit: String(limit) })
-  return getApi<ProductSummaryDto[]>(
+  const response = await getApi<HybridRelatedProductsDto>(
     `/api/v1/catalog/products/${encodeURIComponent(sku)}/similar?${params.toString()}`,
     signal,
   )
+
+  return {
+    coPurchase: response?.coPurchase ?? [],
+    byCategory: response?.byCategory ?? [],
+  }
 }

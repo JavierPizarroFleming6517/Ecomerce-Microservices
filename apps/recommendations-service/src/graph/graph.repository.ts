@@ -16,6 +16,12 @@ export class GraphRepository {
     productId: string,
     limit: number,
   ): Promise<CrossSellingRecommendation[]> {
+    // ---------------------------------------------------------------------------
+    // Enfoque CO-COMPRA (collaborative filtering / cross-selling):
+    // Parte del producto actual, sube a clientes que lo compraron y baja a otros
+    // productos que esos mismos clientes también compraron. El score es cuántos
+    // clientes distintos hacen ese puente.
+    // ---------------------------------------------------------------------------
     return this.neo4j.executeRead(async (transaction) => {
       const result = await transaction.run(
         `

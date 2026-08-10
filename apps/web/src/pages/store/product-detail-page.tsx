@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import type { ProductDetailDto, ProductSummaryDto } from '@retail/contracts'
+import type {
+  HybridRelatedProductsDto,
+  ProductDetailDto,
+  ProductSummaryDto,
+} from '@retail/contracts'
 import { ProductCard } from '../../components/catalog/ProductCard'
 import { StorefrontFooter } from '../../components/store/storefront-footer'
 import { StorefrontHeader } from '../../components/store/storefront-header'
@@ -21,14 +25,24 @@ function stockLabel(stockOnline: number): { text: string; available: boolean } {
   return { text: `${stockOnline} unidades`, available: true }
 }
 
+function RelatedProductsGrid({ products }: { products: ProductSummaryDto[] }) {
+  return (
+    <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {products.slice(0, 4).map((item) => (
+        <ProductCard key={item.sku} product={item} />
+      ))}
+    </div>
+  )
+}
+
 function ProductDetailContent({
   product,
-  similar,
-  similarLoading,
+  related,
+  relatedLoading,
 }: {
   product: ProductDetailDto
-  similar: ProductSummaryDto[]
-  similarLoading: boolean
+  related: HybridRelatedProductsDto
+  relatedLoading: boolean
 }) {
   const { addItem } = useCart()
   const [activeImage, setActiveImage] = useState(0)
@@ -237,29 +251,52 @@ function ProductDetailContent({
         )}
       </section>
 
-      <section className="mt-14">
+      {/* Sección híbrida: co-compra (Neo4j) + misma categoría (catálogo) */}
+      <section className="mt-14 space-y-14">
+        {relatedLoading ? (
+          <p className="text-center text-sm text-neutral-500">
+            Cargando productos relacionados…
+          </p>
+        ) : (
+          <>
+            {/* Enfoque CO-COMPRA */}
+            <div>
               <h2 className="text-center text-2xl font-semibold text-white">
-                Productos relacionados
+                Quienes compraron esto también compraron
               </h2>
               <div className="mx-auto mt-2 h-0.5 w-12 rounded-full bg-sky-400" />
               <p className="mt-3 text-center text-sm text-neutral-500">
-                Quienes compraron esto también se interesaron en
+                Recomendaciones por historial de compras compartidas (co-compra)
               </p>
 
-        {similarLoading ? (
-          <p className="mt-8 text-center text-sm text-neutral-500">
-            Cargando similares…
-          </p>
-        ) : similar.length === 0 ? (
-          <p className="mt-8 text-center text-sm text-neutral-500">
-            No hay productos relacionados por ahora.
-          </p>
-        ) : (
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {similar.slice(0, 4).map((item) => (
-              <ProductCard key={item.sku} product={item} />
-            ))}
-          </div>
+              {related.coPurchase.length === 0 ? (
+                <p className="mt-8 text-center text-sm text-neutral-500">
+                  Aún no hay suficientes compras para recomendar por co-compra.
+                </p>
+              ) : (
+                <RelatedProductsGrid products={related.coPurchase} />
+              )}
+            </div>
+
+            {/* Enfoque POR CATEGORÍA */}
+            <div>
+              <h2 className="text-center text-2xl font-semibold text-white">
+                Te puede interesar
+              </h2>
+              <div className="mx-auto mt-2 h-0.5 w-12 rounded-full bg-sky-400" />
+              <p className="mt-3 text-center text-sm text-neutral-500">
+                Más productos de la misma categoría
+              </p>
+
+              {related.byCategory.length === 0 ? (
+                <p className="mt-8 text-center text-sm text-neutral-500">
+                  No hay otros productos en esta categoría por ahora.
+                </p>
+              ) : (
+                <RelatedProductsGrid products={related.byCategory} />
+              )}
+            </div>
+          </>
         )}
       </section>
     </>
@@ -269,8 +306,7 @@ function ProductDetailContent({
 export function ProductDetailPage() {
   const { sku } = useParams<{ sku: string }>()
   const { product, isLoading, error } = useProduct(sku)
-  const { products: similar, isLoading: similarLoading } =
-    useSimilarProducts(sku)
+  const { related, isLoading: relatedLoading } = useSimilarProducts(sku)
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100">
@@ -295,8 +331,8 @@ export function ProductDetailPage() {
           <ProductDetailContent
             key={product.sku}
             product={product}
-            similar={similar}
-            similarLoading={similarLoading}
+            related={related}
+            relatedLoading={relatedLoading}
           />
         )}
       </main>

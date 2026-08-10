@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { ApiBadGatewayResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import type {
   CrossSellingRecommendationDto,
+  HybridRelatedProductsDto,
   ListCategoriesResponseDto,
   ListProductsResponseDto,
   PingResponseDto,
@@ -62,14 +63,14 @@ export class CatalogController {
   @Get('products/:sku/similar')
   @ApiOkResponse({
     description:
-      'Related products from Neo4j cross-selling, hydrated with catalog details',
+      'Hybrid related products: Neo4j co-purchase + same-category catalog fallback',
   })
   @ApiBadGatewayResponse({ description: 'Downstream service is unavailable' })
   async listSimilarProducts(
     @Req() request: CorrelatedRequest,
     @Param('sku') sku: string,
     @Query('limit') limit?: string,
-  ): Promise<ProductSummaryDto[]> {
+  ): Promise<HybridRelatedProductsDto> {
     const parsedLimit = limit ? Number(limit) : 8;
     const safeLimit =
       Number.isFinite(parsedLimit) && parsedLimit > 0
@@ -77,9 +78,22 @@ export class CatalogController {
         : 8;
     const headers = { 'x-correlation-id': request.correlationId };
 
-    let recommendations: CrossSellingRecommendationDto[] = [];
+    // =========================================================================
+    // Enfoque HÍBRIDO de productos relacionados
+    // 1) Co-compra (Neo4j): "quienes compraron esto también compraron..."
+    // 2) Categoría (Mongo/catálogo): otros productos de la misma categoría
+    // Ambos se devuelven por separado para poder mostrarlos en secciones distintas.
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // SECCIÓN CO-COMPRA (Neo4j / recommendations-service)
+    // Usa el historial Customer -[:PURCHASED]-> Product y ordena por score.
+    // -------------------------------------------------------------------------
+    let coPurchase: ProductSummaryDto[] = [];
     try {
-      recommendations = await this.http.get<CrossSellingRecommendationDto[]>(
+      const recommendations = await this.http.get<
+        CrossSellingRecommendationDto[]
+      >(
         this.recommendationsServiceUrl,
         `/recommendations/cross-selling/${encodeURIComponent(sku)}`,
         {
@@ -87,38 +101,56 @@ export class CatalogController {
           headers,
         },
       );
+
+      const hydrated = await Promise.all(
+        recommendations.map(async (recommendation) => {
+          try {
+            const detail = await this.http.get<ProductDetailDto>(
+              this.catalogServiceUrl,
+              `/products/${encodeURIComponent(recommendation.productId)}`,
+              { headers },
+            );
+
+            return this.toSummary(detail);
+          } catch {
+            return null;
+          }
+        }),
+      );
+
+      coPurchase = hydrated.filter(
+        (item): item is ProductSummaryDto => item !== null,
+      );
     } catch {
-      recommendations = [];
+      coPurchase = [];
     }
 
-    if (recommendations.length === 0) {
-      return this.http.get<ProductSummaryDto[]>(
+    // -------------------------------------------------------------------------
+    // SECCIÓN POR CATEGORÍA (catalog-service / Mongo)
+    // Completa o respalda con productos de la misma categoría.
+    // Excluye el SKU actual y los que ya vinieron por co-compra (sin duplicados).
+    // -------------------------------------------------------------------------
+    let byCategory: ProductSummaryDto[] = [];
+    try {
+      const categoryCandidates = await this.http.get<ProductSummaryDto[]>(
         this.catalogServiceUrl,
         `/products/${encodeURIComponent(sku)}/similar`,
         {
-          params: { limit: safeLimit },
+          // Pedimos un poco más para poder filtrar duplicados y aún llenar el cupo.
+          params: { limit: safeLimit * 2 },
           headers,
         },
       );
+
+      const alreadyRecommended = new Set(coPurchase.map((item) => item.sku));
+      byCategory = categoryCandidates
+        .filter((item) => !alreadyRecommended.has(item.sku))
+        .slice(0, safeLimit);
+    } catch {
+      byCategory = [];
     }
 
-    const hydrated = await Promise.all(
-      recommendations.map(async (recommendation) => {
-        try {
-          const detail = await this.http.get<ProductDetailDto>(
-            this.catalogServiceUrl,
-            `/products/${encodeURIComponent(recommendation.productId)}`,
-            { headers },
-          );
-
-          return this.toSummary(detail);
-        } catch {
-          return null;
-        }
-      }),
-    );
-
-    return hydrated.filter((item): item is ProductSummaryDto => item !== null);
+    return { coPurchase, byCategory };
   }
 
   @Get('products/:sku')

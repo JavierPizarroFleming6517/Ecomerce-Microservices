@@ -12,6 +12,7 @@ export class RecommendationsService {
     productId: string,
     requestedLimit: number,
   ): Promise<CrossSellingRecommendation[]> {
+    // Enfoque CO-COMPRA: delega en Neo4j el score de compras compartidas.
     const limit = Math.min(Math.max(requestedLimit, 1), 50);
     return this.graphRepository.findCrossSelling(productId, limit);
   }

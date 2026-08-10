@@ -1,29 +1,35 @@
-import type { ProductSummaryDto } from '@retail/contracts'
+import type { HybridRelatedProductsDto } from '@retail/contracts'
 import { useCallback, useEffect, useState } from 'react'
 import { getSimilarProducts } from '../../api/catalog'
 
+const EMPTY_RELATED: HybridRelatedProductsDto = {
+  coPurchase: [],
+  byCategory: [],
+}
+
 async function fetchSimilar(
   sku: string,
-  setProducts: (products: ProductSummaryDto[]) => void,
+  setRelated: (related: HybridRelatedProductsDto) => void,
   setIsLoading: (isLoading: boolean) => void,
   signal?: AbortSignal,
 ) {
   try {
     const items = await getSimilarProducts(sku, 8, signal)
     if (!signal?.aborted) {
-      setProducts(items)
+      setRelated(items)
       setIsLoading(false)
     }
   } catch {
     if (!signal?.aborted) {
-      setProducts([])
+      setRelated(EMPTY_RELATED)
       setIsLoading(false)
     }
   }
 }
 
 export function useSimilarProducts(sku: string | undefined) {
-  const [products, setProducts] = useState<ProductSummaryDto[]>([])
+  const [related, setRelated] =
+    useState<HybridRelatedProductsDto>(EMPTY_RELATED)
   const [isLoading, setIsLoading] = useState(Boolean(sku))
 
   const load = useCallback(
@@ -31,7 +37,7 @@ export function useSimilarProducts(sku: string | undefined) {
       if (!sku) {
         return Promise.resolve()
       }
-      return fetchSimilar(sku, setProducts, setIsLoading, signal)
+      return fetchSimilar(sku, setRelated, setIsLoading, signal)
     },
     [sku],
   )
@@ -46,5 +52,5 @@ export function useSimilarProducts(sku: string | undefined) {
     return () => controller.abort()
   }, [load, sku])
 
-  return { products, isLoading }
+  return { related, isLoading }
 }

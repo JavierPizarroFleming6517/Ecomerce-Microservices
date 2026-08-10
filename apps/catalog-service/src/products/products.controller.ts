@@ -42,6 +42,7 @@ export class ProductsController {
     return this.products.listActive(parsedLimit, undefined, parsedPage);
   }
 
+  // Enfoque POR CATEGORÍA: endpoint usado por el gateway en el híbrido de relacionados.
   @Get(':sku/similar')
   listSimilar(
     @Param('sku') sku: string,

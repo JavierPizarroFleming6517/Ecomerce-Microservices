@@ -50,3 +50,11 @@ export interface ListCategoriesRequestDto {
 export interface ListCategoriesResponseDto {
   items: CategorySummaryDto[]
 }
+
+/** Respuesta híbrida de productos relacionados (co-compra + categoría). */
+export interface HybridRelatedProductsDto {
+  /** Enfoque co-compra: Neo4j (Customer)-[:PURCHASED]->(Product). */
+  coPurchase: ProductSummaryDto[]
+  /** Enfoque por categoría: mismos productos de categoría en el catálogo. */
+  byCategory: ProductSummaryDto[]
+}

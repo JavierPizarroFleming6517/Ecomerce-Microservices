@@ -37,6 +37,11 @@ export class ProductsService {
   }
 
   async listSimilar(sku: string, limit = 8): Promise<ProductSummaryDto[]> {
+    // ---------------------------------------------------------------------------
+    // Enfoque POR CATEGORÍA:
+    // Busca otros productos activos de la misma categoría en Mongo (catálogo).
+    // Sirve como complemento / cold-start cuando aún no hay historial de compras.
+    // ---------------------------------------------------------------------------
     const product = await this.products.findBySku(sku);
     if (!product) {
       throw new NotFoundException(`Product ${sku} not found`);
