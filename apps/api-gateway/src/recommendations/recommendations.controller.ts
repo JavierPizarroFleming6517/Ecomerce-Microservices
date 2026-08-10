@@ -1,7 +1,14 @@
-import { Controller, Get, Req } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiBadGatewayResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import type { PingResponseDto } from '@retail/contracts';
+import {
+  ApiBadGatewayResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import type {
+  CrossSellingRecommendationDto,
+  PingResponseDto,
+} from '@retail/contracts';
 import type { Request } from 'express';
 
 import { InternalHttpService } from '../internal/internal-http.service';
@@ -31,5 +38,27 @@ export class RecommendationsController {
     return this.http.get(this.recommendationsServiceUrl, '/ping', {
       headers: { 'x-correlation-id': request.correlationId },
     });
+  }
+
+  @Get('cross-selling/:productId')
+  @ApiOkResponse({ description: 'Neo4j cross-selling recommendations' })
+  @ApiBadGatewayResponse({
+    description: 'Recommendations service is unavailable',
+  })
+  getCrossSelling(
+    @Req() request: CorrelatedRequest,
+    @Param('productId') productId: string,
+    @Query('limit') limit?: string,
+  ): Promise<CrossSellingRecommendationDto[]> {
+    return this.http.get(
+      this.recommendationsServiceUrl,
+      `/recommendations/cross-selling/${encodeURIComponent(productId)}`,
+      {
+        params: {
+          limit: limit ? Number(limit) : undefined,
+        },
+        headers: { 'x-correlation-id': request.correlationId },
+      },
+    );
   }
 }

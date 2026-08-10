@@ -3,11 +3,13 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { createNestPinoOptions, LoggerModule } from '@retail/logger';
 
+import { AuthModule } from './auth/auth.module';
 import { CorrelationIdInterceptor } from './common/correlation-id.interceptor';
 import { HttpExceptionFilter } from './common/http-exception.filter';
 import { environmentValidationSchema } from './config/environment.validation';
 import { HealthModule } from './health/health.module';
 import { CatalogModule } from './catalog/catalog.module';
+import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
 import { RecommendationsModule } from './recommendations/recommendations.module';
 import { UsersModule } from './users/users.module';
@@ -24,7 +26,9 @@ import { UsersModule } from './users/users.module';
       createNestPinoOptions({ serviceName: 'api-gateway' }),
     ),
     HealthModule,
+    AuthModule,
     UsersModule,
+    OrdersModule,
     CatalogModule,
     RecommendationsModule,
     PaymentsModule,

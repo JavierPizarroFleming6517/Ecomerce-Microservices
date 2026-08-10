@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../states/auth/use-auth'
 import { useCart } from '../../states/cart/use-cart'
 
 interface StorefrontHeaderProps {
@@ -7,12 +8,59 @@ interface StorefrontHeaderProps {
   showSearch?: boolean
 }
 
+function UserIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="size-7 shrink-0"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="8" r="3.25" />
+      <path
+        strokeLinecap="round"
+        d="M5.5 19.25c1.4-3.1 3.7-4.65 6.5-4.65s5.1 1.55 6.5 4.65"
+      />
+    </svg>
+  )
+}
+
+function CartIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="size-7"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3.5 5h1.7l1.4 10.2a1.5 1.5 0 0 0 1.5 1.3h8.6a1.5 1.5 0 0 0 1.5-1.25L19.5 8H7"
+      />
+      <circle cx="9.5" cy="20" r="1.15" fill="currentColor" stroke="none" />
+      <circle cx="16.5" cy="20" r="1.15" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
 export function StorefrontHeader({
   searchTerm = '',
   onSearchChange,
   showSearch = false,
 }: StorefrontHeaderProps) {
   const { itemCount } = useCart()
+  const { user, isAuthenticated } = useAuth()
+
+  const accountSubtitle = isAuthenticated
+    ? user?.firstName?.trim() ||
+      user?.email?.split('@')[0] ||
+      'Mi cuenta'
+    : 'Inicia sesión'
 
   return (
     <>
@@ -47,17 +95,32 @@ export function StorefrontHeader({
             <div className="hidden flex-1 sm:block" />
           )}
 
-          <div className="flex items-center justify-end gap-5 text-sm text-neutral-300">
-            <button type="button" className="transition hover:text-white">
-              Iniciar sesión
-            </button>
+          <div className="flex items-center justify-end gap-4 text-white">
+            <Link
+              to={isAuthenticated ? '/cuenta' : '/iniciar-sesion'}
+              className="flex items-center gap-2.5 transition hover:opacity-85"
+            >
+              <UserIcon />
+              <span className="leading-tight">
+                <span className="block text-sm font-normal">Hola!</span>
+                <span className="block text-sm font-bold">{accountSubtitle}</span>
+              </span>
+            </Link>
+
+            <span className="h-8 w-px bg-white/70" aria-hidden="true" />
+
             <Link
               to="/carrito"
-              className="relative transition hover:text-white"
+              className="relative transition hover:opacity-85"
+              aria-label={
+                itemCount > 0
+                  ? `Carrito con ${itemCount} productos`
+                  : 'Carrito'
+              }
             >
-              Carrito
+              <CartIcon />
               {itemCount > 0 ? (
-                <span className="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-xs font-semibold text-neutral-950">
+                <span className="absolute -right-2 -top-1.5 inline-flex min-w-4 items-center justify-center rounded-full bg-white px-1 text-[10px] font-semibold leading-4 text-neutral-950">
                   {itemCount}
                 </span>
               ) : null}

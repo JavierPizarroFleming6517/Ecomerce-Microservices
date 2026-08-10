@@ -1,19 +1,22 @@
-import { createHash } from 'node:crypto';
 import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main(): Promise<void> {
   const email = 'admin@retail.local';
+  const passwordHash = await bcrypt.hash('change-me-before-production', 12);
 
   await prisma.user.upsert({
     where: { email },
-    update: {},
+    update: {
+      passwordHash,
+      isActive: true,
+      emailVerifiedAt: new Date(),
+    },
     create: {
       email,
-      passwordHash: createHash('sha256')
-        .update('change-me-before-production')
-        .digest('hex'),
+      passwordHash,
       emailVerifiedAt: new Date(),
       profile: {
         create: {

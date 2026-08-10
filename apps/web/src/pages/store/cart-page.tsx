@@ -5,12 +5,15 @@ import {
   redirectToWebpay,
 } from '../../api/payments'
 import { StorefrontHeader } from '../../components/store/storefront-header'
+import { useAuth } from '../../states/auth/use-auth'
 import { useCart } from '../../states/cart/use-cart'
+import { savePendingCheckout } from '../../states/orders/pending-checkout'
 import { formatPrice } from '../../utils/format-price'
 
 export function CartPage() {
   const { items, subtotal, currency, setQuantity, removeItem, itemCount } =
     useCart()
+  const { isAuthenticated } = useAuth()
   const [isPaying, setIsPaying] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -27,6 +30,13 @@ export function CartPage() {
       if (amount < 1) {
         throw new Error('El monto del pedido debe ser mayor a 0.')
       }
+
+      savePendingCheckout({
+        items,
+        amount,
+        currency,
+        createdAt: new Date().toISOString(),
+      })
 
       const transaction = await createPaymentTransaction(amount)
       redirectToWebpay(transaction.url, transaction.token)
@@ -155,6 +165,9 @@ export function CartPage() {
               <p className="mt-3 text-xs text-neutral-500">
                 Serás enviado al formulario seguro de Transbank para completar el
                 pago.
+                {!isAuthenticated
+                  ? ' Inicia sesión antes de pagar si quieres ver el pedido en Mi cuenta.'
+                  : ' El pedido quedará registrado en Mi cuenta al autorizarse.'}
               </p>
             </aside>
           </div>

@@ -18,6 +18,7 @@ model User {
   updatedAt       DateTime       @updatedAt @map("updated_at")
   profile         Profile?
   refreshTokens   RefreshToken[]
+  orders          Order[]
 
   @@index([isActive])
   @@index([createdAt])
@@ -51,4 +52,37 @@ model RefreshToken {
   @@index([userId, revokedAt])
   @@index([expiresAt])
   @@map("refresh_tokens")
+}
+
+model Order {
+  id                String      @id @default(uuid()) @db.Uuid
+  userId            String      @map("user_id") @db.Uuid
+  buyOrder          String      @unique @map("buy_order") @db.VarChar(32)
+  amount            Int
+  currency          String      @db.VarChar(3)
+  status            String      @db.VarChar(32)
+  authorizationCode String?     @map("authorization_code") @db.VarChar(64)
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items             OrderItem[]
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String @id @default(uuid()) @db.Uuid
+  orderId   String @map("order_id") @db.Uuid
+  sku       String @db.VarChar(64)
+  name      String @db.VarChar(255)
+  unitPrice Int    @map("unit_price")
+  quantity  Int
+  imageUrl  String @default("") @map("image_url") @db.VarChar(2048)
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([sku])
+  @@map("order_items")
 }

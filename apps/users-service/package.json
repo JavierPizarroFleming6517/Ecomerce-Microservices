@@ -34,6 +34,9 @@
     "@prisma/client": "^6.19.0",
     "@retail/contracts": "workspace:*",
     "@retail/logger": "workspace:*",
+    "bcryptjs": "^3.0.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.4",
     "joi": "^17.13.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
@@ -46,6 +49,7 @@
     "@nestjs/testing": "^11.0.1",
     "@retail/eslint-config": "workspace:*",
     "@retail/typescript-config": "workspace:*",
+    "@types/bcryptjs": "^3.0.0",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.0",

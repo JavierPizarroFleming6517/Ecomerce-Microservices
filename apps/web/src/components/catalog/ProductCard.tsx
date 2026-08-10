@@ -22,7 +22,11 @@ export function ProductCard({ product }: ProductCardProps) {
           />
         </div>
         <div className="p-4 pb-0">
-          {product.category ? (
+          {product.brand ? (
+            <p className="text-xs font-semibold uppercase tracking-wide text-sky-300/90">
+              {product.brand}
+            </p>
+          ) : product.category ? (
             <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
               {product.category}
             </p>
@@ -40,14 +44,14 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="flex gap-2 p-4 pt-3">
         <Link
           to={`/producto/${encodeURIComponent(product.sku)}`}
-          className="flex-1 rounded-lg border border-white/15 px-3 py-2 text-center text-sm font-medium text-neutral-200 transition hover:border-white/30 hover:text-white"
+          className="flex-1 rounded-lg border border-white/15 px-3 py-2 text-center text-sm font-medium text-neutral-200 transition duration-100 hover:border-white/30 hover:text-white active:scale-[0.96] active:bg-white/10"
         >
           Ver detalle
         </Link>
         <button
           type="button"
           onClick={() => addItem(product)}
-          className="flex-1 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-200"
+          className="flex-1 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-neutral-950 transition duration-100 hover:bg-neutral-200 active:scale-[0.96] active:bg-neutral-300"
         >
           Agregar
         </button>

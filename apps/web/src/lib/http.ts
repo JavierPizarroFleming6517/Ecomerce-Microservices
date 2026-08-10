@@ -10,20 +10,55 @@ export class HttpError extends Error {
   }
 }
 
+export interface ApiRequestOptions {
+  signal?: AbortSignal
+  accessToken?: string | null
+  headers?: Record<string, string>
+}
+
 export function getApiUrl(path: string): string {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
   return `${API_BASE_URL}${normalizedPath}`
 }
 
-async function parseResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    throw new HttpError(
-      `La API respondió con estado ${response.status}.`,
-      response.status,
-    )
+function buildHeaders(
+  options?: ApiRequestOptions,
+  includeJsonBody = false,
+): HeadersInit {
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    ...(includeJsonBody ? { 'Content-Type': 'application/json' } : {}),
+    ...options?.headers,
   }
 
+  if (options?.accessToken) {
+    headers.Authorization = `Bearer ${options.accessToken}`
+  }
+
+  return headers
+}
+
+async function parseResponse<T>(response: Response): Promise<T> {
   const body = await response.text()
+
+  if (!response.ok) {
+    let message = `La API respondió con estado ${response.status}.`
+
+    if (body) {
+      try {
+        const parsed = JSON.parse(body) as { message?: string | string[] }
+        if (typeof parsed.message === 'string') {
+          message = parsed.message
+        } else if (Array.isArray(parsed.message)) {
+          message = parsed.message.join(', ')
+        }
+      } catch {
+        // keep default message
+      }
+    }
+
+    throw new HttpError(message, response.status)
+  }
 
   if (!body) {
     return undefined as T
@@ -38,12 +73,17 @@ async function parseResponse<T>(response: Response): Promise<T> {
 
 export async function getApi<T>(
   path: string,
-  signal?: AbortSignal,
+  signalOrOptions?: AbortSignal | ApiRequestOptions,
 ): Promise<T> {
+  const options =
+    signalOrOptions instanceof AbortSignal
+      ? { signal: signalOrOptions }
+      : signalOrOptions
+
   const response = await fetch(getApiUrl(path), {
     method: 'GET',
-    headers: { Accept: 'application/json' },
-    signal,
+    headers: buildHeaders(options),
+    signal: options?.signal,
   })
 
   return parseResponse<T>(response)
@@ -52,16 +92,18 @@ export async function getApi<T>(
 export async function postApi<T>(
   path: string,
   data?: unknown,
-  signal?: AbortSignal,
+  signalOrOptions?: AbortSignal | ApiRequestOptions,
 ): Promise<T> {
+  const options =
+    signalOrOptions instanceof AbortSignal
+      ? { signal: signalOrOptions }
+      : signalOrOptions
+
   const response = await fetch(getApiUrl(path), {
     method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
+    headers: buildHeaders(options, true),
     body: data === undefined ? undefined : JSON.stringify(data),
-    signal,
+    signal: options?.signal,
   })
 
   return parseResponse<T>(response)

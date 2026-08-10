@@ -4,6 +4,7 @@ import { createNestPinoOptions, LoggerModule } from '@retail/logger';
 import { AuthModule } from './auth/auth.module';
 import { environmentValidationSchema } from './config/environment.validation';
 import { HealthModule } from './health/health.module';
+import { OrdersModule } from './orders/orders.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { UsersModule } from './users/users.module';
@@ -23,7 +24,9 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     UsersModule,
     ProfilesModule,
+    OrdersModule,
     HealthModule,
   ],
 })
 export class AppModule {}
+

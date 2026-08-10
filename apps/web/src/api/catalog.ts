@@ -2,6 +2,7 @@ import type {
   CategorySummaryDto,
   ListCategoriesResponseDto,
   ListProductsResponseDto,
+  ProductDetailDto,
   ProductSummaryDto,
 } from '@retail/contracts'
 import { getApi } from '../lib/http'
@@ -17,31 +18,55 @@ export async function getCategories(
   return response?.items ?? []
 }
 
-export async function getProducts(
+export async function getProductsPage(
   limit = 12,
+  page = 1,
   categorySlug?: string | null,
   signal?: AbortSignal,
-): Promise<ProductSummaryDto[]> {
-  const params = new URLSearchParams({ limit: String(limit) })
+): Promise<ListProductsResponseDto> {
+  const params = new URLSearchParams({
+    limit: String(limit),
+    page: String(page),
+  })
 
   if (categorySlug) {
     params.set('category', categorySlug)
   }
 
-  const response = await getApi<ListProductsResponseDto>(
+  return getApi<ListProductsResponseDto>(
     `/api/v1/catalog/products?${params.toString()}`,
     signal,
   )
+}
 
+/** @deprecated Prefer getProductsPage for pagination metadata. */
+export async function getProducts(
+  limit = 12,
+  categorySlug?: string | null,
+  signal?: AbortSignal,
+): Promise<ProductSummaryDto[]> {
+  const response = await getProductsPage(limit, 1, categorySlug, signal)
   return response?.items ?? []
 }
 
 export async function getProduct(
   sku: string,
   signal?: AbortSignal,
-): Promise<ProductSummaryDto> {
-  return getApi<ProductSummaryDto>(
+): Promise<ProductDetailDto> {
+  return getApi<ProductDetailDto>(
     `/api/v1/catalog/products/${encodeURIComponent(sku)}`,
+    signal,
+  )
+}
+
+export async function getSimilarProducts(
+  sku: string,
+  limit = 8,
+  signal?: AbortSignal,
+): Promise<ProductSummaryDto[]> {
+  const params = new URLSearchParams({ limit: String(limit) })
+  return getApi<ProductSummaryDto[]>(
+    `/api/v1/catalog/products/${encodeURIComponent(sku)}/similar?${params.toString()}`,
     signal,
   )
 }

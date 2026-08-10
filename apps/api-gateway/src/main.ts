@@ -34,6 +34,7 @@ async function bootstrap() {
     .setTitle('Retail API Gateway')
     .setDescription('REST façade for the Retail platform services')
     .setVersion('1.0')
+    .addBearerAuth()
     .addApiKey(
       { type: 'apiKey', name: 'x-correlation-id', in: 'header' },
       'correlation-id',

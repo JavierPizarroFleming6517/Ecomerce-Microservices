@@ -1,14 +1,21 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import type { CommitPaymentTransactionResponseDto } from '@retail/contracts'
+import { createOrder } from '../../api/orders'
 import { commitPaymentTransaction } from '../../api/payments'
 import { StorefrontHeader } from '../../components/store/storefront-header'
+import { useAuth } from '../../states/auth/use-auth'
 import { useCart } from '../../states/cart/use-cart'
+import {
+  clearPendingCheckout,
+  readPendingCheckout,
+} from '../../states/orders/pending-checkout'
 import { formatPrice } from '../../utils/format-price'
 
 export function PaymentResultPage() {
   const [params] = useSearchParams()
   const { clearCart } = useCart()
+  const { accessToken, isAuthenticated } = useAuth()
   const tokenWs = params.get('token_ws')
   const cancelled = params.get('cancelled') === '1'
   const timeout = params.get('timeout') === '1'
@@ -33,15 +40,46 @@ export function PaymentResultPage() {
     const controller = new AbortController()
 
     void commitPaymentTransaction(tokenWs, controller.signal)
-      .then((response) => {
+      .then(async (response) => {
         if (controller.signal.aborted) {
           return
         }
-        setResult(response)
+
         if (response.status === 'authorized') {
+          const pending = readPendingCheckout()
+          if (pending && isAuthenticated && accessToken) {
+            try {
+              await createOrder(
+                accessToken,
+                {
+                  buyOrder: response.buyOrder,
+                  amount: response.amount,
+                  currency: pending.currency || 'CLP',
+                  status: 'paid',
+                  authorizationCode: response.authorizationCode,
+                  items: pending.items.map((item) => ({
+                    sku: item.sku,
+                    name: item.name,
+                    unitPrice: Math.round(item.price),
+                    quantity: item.quantity,
+                    imageUrl: item.imageUrl,
+                  })),
+                },
+                controller.signal,
+              )
+            } catch {
+              // Payment already authorized; order sync can be retried later.
+            }
+          }
+
+          clearPendingCheckout()
           clearCart()
         }
-        setIsLoading(false)
+
+        if (!controller.signal.aborted) {
+          setResult(response)
+          setIsLoading(false)
+        }
       })
       .catch((err: unknown) => {
         if (controller.signal.aborted) {
@@ -56,7 +94,7 @@ export function PaymentResultPage() {
       })
 
     return () => controller.abort()
-  }, [clearCart, earlyError, tokenWs])
+  }, [accessToken, clearCart, earlyError, isAuthenticated, tokenWs])
 
   const error = earlyError ?? commitError
   const approved = result?.status === 'authorized'
@@ -98,6 +136,15 @@ export function PaymentResultPage() {
                 </div>
               ) : null}
             </dl>
+            {isAuthenticated ? (
+              <p className="mt-4 text-sm text-emerald-100/80">
+                Puedes ver este pedido en{' '}
+                <Link to="/cuenta" className="font-semibold underline">
+                  Mi cuenta
+                </Link>
+                .
+              </p>
+            ) : null}
           </div>
         ) : (
           <div className="mt-6 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-6">

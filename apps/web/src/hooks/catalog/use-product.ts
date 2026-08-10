@@ -1,10 +1,10 @@
-import type { ProductSummaryDto } from '@retail/contracts'
+import type { ProductDetailDto } from '@retail/contracts'
 import { useCallback, useEffect, useState } from 'react'
 import { getProduct } from '../../api/catalog'
 
 async function fetchProduct(
   sku: string,
-  setProduct: (product: ProductSummaryDto | null) => void,
+  setProduct: (product: ProductDetailDto | null) => void,
   setIsLoading: (isLoading: boolean) => void,
   setError: (error: string | null) => void,
   signal?: AbortSignal,
@@ -30,7 +30,7 @@ async function fetchProduct(
 }
 
 export function useProduct(sku: string | undefined) {
-  const [product, setProduct] = useState<ProductSummaryDto | null>(null)
+  const [product, setProduct] = useState<ProductDetailDto | null>(null)
   const [isLoading, setIsLoading] = useState(Boolean(sku))
   const [error, setError] = useState<string | null>(
     sku ? null : 'Producto no encontrado',
