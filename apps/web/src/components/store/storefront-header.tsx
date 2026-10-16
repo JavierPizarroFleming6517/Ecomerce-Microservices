@@ -1,10 +1,9 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../states/auth/use-auth'
 import { useCart } from '../../states/cart/use-cart'
+import { SearchBox } from './search-box'
 
 interface StorefrontHeaderProps {
-  searchTerm?: string
-  onSearchChange?: (value: string) => void
   showSearch?: boolean
 }
 
@@ -49,8 +48,6 @@ function CartIcon() {
 }
 
 export function StorefrontHeader({
-  searchTerm = '',
-  onSearchChange,
   showSearch = false,
 }: StorefrontHeaderProps) {
   const { itemCount } = useCart()
@@ -63,12 +60,12 @@ export function StorefrontHeader({
     : 'Inicia sesión'
 
   return (
-    <>
+    <div className="sticky top-0 z-30 border-b border-white/10 bg-neutral-950/75 backdrop-blur-md">
       <div className="bg-white/5 px-5 py-2 text-center text-xs font-medium text-neutral-300">
         Envío gratis en compras sobre $50.000 · Retiro gratis en tienda
       </div>
 
-      <header className="bg-neutral-950">
+      <header>
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <Link
             to="/"
@@ -81,16 +78,7 @@ export function StorefrontHeader({
           </Link>
 
           {showSearch ? (
-            <label className="relative w-full sm:max-w-md sm:flex-1">
-              <span className="sr-only">Buscar productos</span>
-              <input
-                type="search"
-                value={searchTerm}
-                onChange={(event) => onSearchChange?.(event.target.value)}
-                placeholder="Busca productos…"
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none"
-              />
-            </label>
+            <SearchBox />
           ) : (
             <div className="hidden flex-1 sm:block" />
           )}
@@ -128,6 +116,6 @@ export function StorefrontHeader({
           </div>
         </div>
       </header>
-    </>
+    </div>
   )
 }

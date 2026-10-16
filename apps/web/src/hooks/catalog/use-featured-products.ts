@@ -7,14 +7,18 @@ const PAGE_SIZE = 12
 async function fetchProductsPage(
   categorySlug: string | null,
   page: number,
+  requestKey: string,
   setProducts: (products: ProductSummaryDto[]) => void,
   setPage: (page: number) => void,
   setTotalPages: (totalPages: number) => void,
   setTotal: (total: number) => void,
+  setLoadedKey: (requestKey: string) => void,
   setIsLoading: (isLoading: boolean) => void,
   setError: (error: string | null) => void,
   signal?: AbortSignal,
 ) {
+  setIsLoading(true)
+
   try {
     const response = await getProductsPage(
       PAGE_SIZE,
@@ -28,11 +32,16 @@ async function fetchProductsPage(
       setPage(response.page)
       setTotalPages(response.totalPages)
       setTotal(response.total)
+      setLoadedKey(requestKey)
       setError(null)
       setIsLoading(false)
     }
   } catch (error) {
     if (!signal?.aborted) {
+      setProducts([])
+      setTotal(0)
+      setTotalPages(0)
+      setLoadedKey(requestKey)
       setError(
         error instanceof Error
           ? error.message
@@ -47,27 +56,32 @@ export function useFeaturedProducts(
   categorySlug: string | null,
   page: number,
 ) {
+  const requestKey = `${categorySlug ?? ''}:${page}`
   const [products, setProducts] = useState<ProductSummaryDto[]>([])
   const [currentPage, setCurrentPage] = useState(page)
   const [totalPages, setTotalPages] = useState(0)
   const [total, setTotal] = useState(0)
+  const [loadedKey, setLoadedKey] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const matchesRequest = loadedKey === requestKey
 
   const load = useCallback(
     (signal?: AbortSignal) =>
       fetchProductsPage(
         categorySlug,
         page,
+        requestKey,
         setProducts,
         setCurrentPage,
         setTotalPages,
         setTotal,
+        setLoadedKey,
         setIsLoading,
         setError,
         signal,
       ),
-    [categorySlug, page],
+    [categorySlug, page, requestKey],
   )
 
   useEffect(() => {
@@ -78,12 +92,12 @@ export function useFeaturedProducts(
   }, [load])
 
   return {
-    products,
-    page: currentPage,
-    totalPages,
-    total,
+    products: matchesRequest ? products : [],
+    page: matchesRequest ? currentPage : page,
+    totalPages: matchesRequest ? totalPages : 0,
+    total: matchesRequest ? total : 0,
     pageSize: PAGE_SIZE,
-    isLoading,
-    error,
+    isLoading: !matchesRequest || isLoading,
+    error: matchesRequest ? error : null,
   }
 }

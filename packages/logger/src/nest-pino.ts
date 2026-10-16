@@ -1,5 +1,7 @@
 import type { Params } from 'nestjs-pino';
 
+import { createRailwayLogStream } from './railway-log-stream';
+
 const DEFAULT_REDACT_PATHS = [
   'req.headers.authorization',
   'req.headers.cookie',
@@ -23,6 +25,7 @@ export function createNestPinoOptions(options: NestPinoOptions): Params {
       autoLogging: options.autoLogging ?? true,
       quietReqLogger: true,
       redact: [...(options.redact ?? DEFAULT_REDACT_PATHS)],
+      stream: createRailwayLogStream(),
     },
   };
 }
