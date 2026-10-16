@@ -2,13 +2,10 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { PinoLogger } from '@retail/logger';
-
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  app.useLogger(app.get(PinoLogger));
+  const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
   const port = config.getOrThrow<number>('API_GATEWAY_PORT');
   const corsOrigins = config

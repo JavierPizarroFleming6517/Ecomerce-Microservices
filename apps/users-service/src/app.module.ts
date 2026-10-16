@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { createNestPinoOptions, LoggerModule } from '@retail/logger';
 import { AuthModule } from './auth/auth.module';
 import { environmentValidationSchema } from './config/environment.validation';
 import { HealthModule } from './health/health.module';
@@ -17,9 +16,6 @@ import { UsersModule } from './users/users.module';
       validationSchema: environmentValidationSchema,
       validationOptions: { abortEarly: false },
     }),
-    LoggerModule.forRoot(
-      createNestPinoOptions({ serviceName: 'users-service' }),
-    ),
     PrismaModule,
     AuthModule,
     UsersModule,

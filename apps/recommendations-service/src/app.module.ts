@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { createNestPinoOptions, LoggerModule } from '@retail/logger';
 import * as Joi from 'joi';
 import { GraphModule } from './graph/graph.module';
 import { HealthModule } from './health/health.module';
@@ -22,9 +21,6 @@ import { RecommendationsModule } from './recommendations/recommendations.module'
         NEO4J_DATABASE: Joi.string().default('neo4j'),
       }),
     }),
-    LoggerModule.forRoot(
-      createNestPinoOptions({ serviceName: 'recommendations-service' }),
-    ),
     Neo4jModule,
     GraphModule,
     RecommendationsModule,
